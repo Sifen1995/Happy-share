@@ -1,8 +1,41 @@
 export default function LandingPage({ navigate, user }) {
   const principles = [
-    { icon: "⊘", title: "No Infinite Scroll", desc: "Conscious breaks are built into our design. Experience natural stop points that encourage you to return to the physical world." },
-    { icon: "👁", title: "No Public Metrics", desc: "Share for yourself, not for the likes. We've removed public like counts to eliminate competitive pressure that fosters authentic expression." },
-    { icon: "⏱", title: "10-Minute Limit", desc: "A gentle reminder to stay present. We encourage mindful consumption with a daily happy limit that respects your time." },
+    {
+      icon: "⏸️",
+      title: "Natural Stop Points",
+      desc: "No endless rabbit holes. You get a clear moment to pause and move on.",
+    },
+    {
+      icon: "🌱",
+      title: "Gentle Energy",
+      desc: "A feed designed to leave you lighter, not overwhelmed or drained.",
+    },
+    {
+      icon: "🧭",
+      title: "Intentional Time",
+      desc: "We reward meaningful moments, not screen-time addiction.",
+    },
+  ];
+
+  const moods = [
+    {
+      title: "Laugh",
+      subtitle: "Funny",
+      image:
+        "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=900&q=80",
+    },
+    {
+      title: "Learn",
+      subtitle: "Feel-Good Knowledge",
+      image:
+        "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=900&q=80",
+    },
+    {
+      title: "Heal",
+      subtitle: "Heartwarming Stories",
+      image:
+        "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=900&q=80",
+    },
   ];
 
   return (
@@ -37,42 +70,51 @@ export default function LandingPage({ navigate, user }) {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-4xl mx-auto px-6 py-14 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-        <div>
-          <h1 className="font-display text-4xl md:text-5xl text-gray-800 leading-tight mb-4">
-            A calmer place to share good moments.
-          </h1>
-          <p className="text-gray-500 leading-relaxed mb-7 text-sm">
-            No noisy feeds, no pressure, no chasing likes. Just simple posts that
-            make your day better.
-          </p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => navigate("register")}
-              className="px-5 py-2.5 bg-gray-800 text-white rounded-xl text-sm font-medium hover:bg-gray-700 transition-colors"
-            >
-              Join the Space
-            </button>
-            <button
-              onClick={() => navigate("login")}
-              className="px-5 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm hover:bg-gray-50 transition-colors"
-            >
-              Enter the Space
-            </button>
+      <section className="max-w-5xl mx-auto px-6 py-12">
+        <div className="rounded-3xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            <div className="p-8 md:p-10">
+              <span className="inline-block text-xs font-semibold bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full mb-4">
+                A better social rhythm
+              </span>
+              <h1 className="font-display text-4xl md:text-5xl text-gray-800 leading-tight mb-4">
+                Share good moments.
+                <br />
+                Leave with a clear mind.
+              </h1>
+              <p className="text-gray-500 leading-relaxed mb-7 text-sm">
+                HappyShare is a quieter corner of the internet where people post
+                joy, kindness, and useful inspiration without pressure.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => navigate("register")}
+                  className="px-5 py-2.5 bg-gray-800 text-white rounded-xl text-sm font-medium hover:bg-gray-700 transition-colors"
+                >
+                  Create Account
+                </button>
+                <button
+                  onClick={() => navigate("login")}
+                  className="px-5 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm hover:bg-gray-50 transition-colors"
+                >
+                  Sign In
+                </button>
+              </div>
+            </div>
+            <div className="relative min-h-[300px]">
+              <img
+                src="https://images.unsplash.com/photo-1528715471579-d1bcf0ba5e83?w=1200&q=80"
+                alt="Creative collage"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
           </div>
-        </div>
-        <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-          <img
-            src="https://images.unsplash.com/photo-1490750967868-88df5691cc3f?w=600&q=80"
-            alt="Nature"
-            className="w-full h-72 object-cover"
-          />
         </div>
       </section>
 
       {/* Principles */}
       <section className="bg-white py-16">
-        <div className="max-w-4xl mx-auto px-6">
+        <div className="max-w-5xl mx-auto px-6">
           <h2 className="font-display text-3xl text-gray-800 text-center mb-2">Why it feels better here</h2>
           <p className="text-gray-400 text-sm text-center mb-10">
             Built to keep you present, not trapped.
@@ -80,7 +122,7 @@ export default function LandingPage({ navigate, user }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {principles.map((p) => (
               <div key={p.title} className="border border-gray-100 rounded-2xl p-6 bg-gray-50/50">
-                <div className="text-lg mb-2">{p.icon}</div>
+                <div className="text-2xl mb-2">{p.icon}</div>
                 <h3 className="font-semibold text-gray-800 mb-2">{p.title}</h3>
                 <p className="text-xs text-gray-500 leading-relaxed">{p.desc}</p>
               </div>
@@ -89,51 +131,41 @@ export default function LandingPage({ navigate, user }) {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Mood board */}
       <section className="py-16">
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className="font-display text-3xl text-gray-800 text-center mb-2">Pick your vibe</h2>
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="font-display text-3xl text-gray-800 text-center mb-2">Choose your mood board</h2>
           <p className="text-gray-400 text-sm text-center mb-10">
-            Choose what you want to see today.
+            Every tab gives you a different emotional texture.
           </p>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-2xl border border-emerald-100 p-5 hover:shadow-md transition-shadow">
-              <div className="text-3xl mb-3">😂</div>
-              <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Daily Joy</span>
-              <h3 className="font-semibold text-gray-800 mt-2 mb-1">Funny</h3>
-              <p className="text-xs text-gray-500 mb-4">
-                Gentle humor that brightens your day without dragging anyone down.
-              </p>
-              <button onClick={() => navigate("login")} className="text-xs text-emerald-700 font-semibold hover:text-emerald-900">Explore Funny →</button>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-blue-100 p-5 hover:shadow-md transition-shadow">
-              <div className="text-3xl mb-3">📚</div>
-              <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">Light Learning</span>
-              <h3 className="font-semibold text-gray-800 mt-2 mb-1">Learn & Feel Good</h3>
-              <p className="text-xs text-gray-500 mb-4">
-                Discover wisdom and positive updates that leave you calmer, not drained.
-              </p>
-              <button onClick={() => navigate("login")} className="text-xs text-blue-700 font-semibold hover:text-blue-900">Start Learning →</button>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-rose-100 p-5 hover:shadow-md transition-shadow">
-              <div className="text-3xl mb-3">❤️</div>
-              <span className="text-xs font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full">Kindness</span>
-              <h3 className="font-semibold text-gray-800 mt-2 mb-1">Heartwarming</h3>
-              <p className="text-xs text-gray-500 mb-4">
-                Stories of community and compassion that restore trust in people.
-              </p>
-              <button onClick={() => navigate("login")} className="text-xs text-rose-700 font-semibold hover:text-rose-900">View Stories →</button>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {moods.map((mood) => (
+              <button
+                key={mood.title}
+                onClick={() => navigate("login")}
+                className="text-left group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+              >
+                <img
+                  src={mood.image}
+                  alt={mood.title}
+                  className="w-full h-44 object-cover group-hover:scale-[1.02] transition-transform"
+                />
+                <div className="p-4">
+                  <p className="text-xs uppercase tracking-wider text-gray-400 mb-1">
+                    {mood.subtitle}
+                  </p>
+                  <h3 className="font-semibold text-gray-800 text-lg">{mood.title}</h3>
+                </div>
+              </button>
+            ))}
           </div>
 
-          <div className="mt-6 bg-emerald-50 border border-emerald-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="mt-8 bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h3 className="font-semibold text-lg mb-1 text-gray-800">Simple feed, better mood</h3>
+              <h3 className="font-semibold text-lg mb-1 text-gray-800">Creative, calm, and actually useful</h3>
               <p className="text-sm text-gray-600">
-                Scroll a little, smile a little, then move on with your day.
+                Start with one post. End with one good idea.
               </p>
             </div>
             <button
@@ -148,8 +180,8 @@ export default function LandingPage({ navigate, user }) {
 
       {/* CTA */}
       <section className="py-16">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-white border border-gray-100 rounded-3xl p-12 text-center">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="bg-white border border-gray-100 rounded-3xl p-12 text-center shadow-sm">
             <h2 className="font-display text-3xl text-gray-800 mb-3">Ready to enter your space?</h2>
             <p className="text-gray-500 text-sm mb-8">
               Join thousands of others who are reclaiming their digital well-being. It's time to feel good about your time online.

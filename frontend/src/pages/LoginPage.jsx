@@ -28,28 +28,25 @@ export default function LoginPage({ navigate, onLogin }) {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-gray-50">
       {/* Left: image panel */}
       <div className="hidden md:block relative">
         <img
-          src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80"
+          src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=1200&q=80"
           alt="Calm space"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/60 to-gray-800/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/70 via-gray-800/30 to-emerald-900/30" />
         <div className="absolute bottom-8 left-8 right-8">
-          <div className="bg-white/10 backdrop-blur rounded-xl p-4 text-white">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 text-white border border-white/20">
             <div className="flex items-center gap-2 text-sm mb-1">
               <span>🌿</span>
-              <span className="font-medium">
-                Focused Session: 12m remaining
-              </span>
+              <span className="font-medium">A calmer social experience</span>
             </div>
             <div className="flex items-start gap-2 text-xs text-white/80">
               <span>😊</span>
               <span>
-                Mindfulness note: Take a deep breath before you enter. Digital
-                spaces are more pleasant when approached with intention.
+                Take a deep breath before you enter. Small positive moments add up.
               </span>
             </div>
           </div>
@@ -57,22 +54,23 @@ export default function LoginPage({ navigate, onLogin }) {
       </div>
 
       {/* Right: login form */}
-      <div className="flex items-center justify-center px-8 py-16 bg-gray-50">
-        <div className="w-full max-w-sm page-fade">
+      <div className="flex items-center justify-center px-8 py-14">
+        <div className="w-full max-w-sm page-fade bg-white border border-gray-100 rounded-3xl shadow-sm p-7">
+          <button
+            onClick={() => navigate("landing")}
+            className="text-xs text-gray-500 hover:text-gray-700 mb-4"
+          >
+            ← Home
+          </button>
+
           {/* Logo */}
-          <div className="mb-8">
+          <div className="mb-7">
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-emerald-600 font-bold text-lg">✦</span>
-              <span className="font-display text-xl text-gray-800">
-                HappyShare
-              </span>
+              <span className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">✦</span>
+              <span className="font-display text-xl text-gray-800">HappyShare</span>
             </div>
-            <h1 className="font-display text-2xl text-gray-800 mb-1">
-              Welcome Back
-            </h1>
-            <p className="text-sm text-gray-400">
-              Or start your journey today.
-            </p>
+            <h1 className="font-display text-3xl text-gray-800 mb-1">Welcome back</h1>
+            <p className="text-sm text-gray-500">Sign in to continue your happy feed.</p>
           </div>
 
           {error && (
@@ -92,12 +90,12 @@ export default function LoginPage({ navigate, onLogin }) {
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               placeholder="Enter your username or email"
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-white"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-white"
             />
           </div>
 
           {/* Password */}
-          <div className="mb-1">
+          <div className="mb-1.5">
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
               Password
             </label>
@@ -107,7 +105,7 @@ export default function LoginPage({ navigate, onLogin }) {
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               placeholder="••••••"
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-white"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-white"
             />
           </div>
           <div className="text-right mb-5">
@@ -120,7 +118,7 @@ export default function LoginPage({ navigate, onLogin }) {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full py-3 bg-gray-800 text-white rounded-xl text-sm font-semibold hover:bg-gray-700 disabled:opacity-60 transition-colors mb-3"
+            className="w-full py-3 bg-gray-800 text-white rounded-xl text-sm font-semibold hover:bg-gray-700 disabled:opacity-60 transition-colors mb-3 shadow-sm"
           >
             {loading ? "Entering..." : "Enter"}
           </button>
@@ -142,10 +140,10 @@ export default function LoginPage({ navigate, onLogin }) {
           {/* Social auth */}
           <div className="grid grid-cols-2 gap-3 mb-6">
             <button className="flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-              <span>G</span> Gmail
+              <span>G</span> Google
             </button>
             <button className="flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-              <span>𝕏</span> Flickr
+              <span>A</span> Apple
             </button>
           </div>
 

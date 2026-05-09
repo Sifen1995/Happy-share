@@ -238,8 +238,8 @@ async function createPost(req, res, next) {
 
     if (req.file) {
       if (req.file.mimetype && req.file.mimetype.startsWith("video")) {
-        // Keep any user-provided link; only fallback to uploaded video URL.
-        postLink = postLink || req.file.path;
+        // If video is uploaded, always store its Cloudinary URL in link.
+        postLink = req.file.path;
       } else {
         imageUrl = req.file.path;
       }

@@ -40,6 +40,11 @@ export default function PostCard({
   const imageSrc = resolveUrl(post.image_url);
 
   const linkSrc = resolveUrl(post.link);
+  const isVideoLink =
+    typeof linkSrc === "string" &&
+    /(\/video\/upload\/|\.mp4(\?|$)|\.mov(\?|$)|\.webm(\?|$)|\.m4v(\?|$))/i.test(
+      linkSrc,
+    );
 
   const isVideoUrl = (url) => {
     if (!url) return false;
@@ -50,7 +55,7 @@ export default function PostCard({
   };
 
   const cloudinaryImageFromLink =
-    !imageSrc && linkSrc && /res\.cloudinary\.com/i.test(linkSrc)
+    !imageSrc && linkSrc && /res\.cloudinary\.com/i.test(linkSrc) && !isVideoLink
       ? linkSrc
       : null;
 
@@ -146,18 +151,21 @@ export default function PostCard({
       )}
 
       {/* Video */}
-      {finalVideoSrc && (
+      {isVideoLink && (
         <div className="px-5 pb-3">
           <video
-            src={finalVideoSrc}
-            controls
+            src={linkSrc}
             className="w-full h-56 object-cover rounded-xl bg-black"
+            controls
+            loop
+            muted
+            playsInline
           />
         </div>
       )}
 
       {/* Link */}
-      {linkSrc && !cloudinaryImageFromLink && !finalVideoSrc && (
+      {linkSrc && !cloudinaryImageFromLink && !isVideoLink && (
         <div className="px-5 pb-3">
           <a
             href={linkSrc}

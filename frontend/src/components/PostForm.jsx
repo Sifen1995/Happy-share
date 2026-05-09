@@ -2,10 +2,11 @@ import { useState } from "react";
 import { FEED_CATEGORIES } from "../constants/categories";
 
 export default function PostForm({ onSubmit, onClose }) {
+  const MAX_MEDIA_SIZE_BYTES = 100 * 1024 * 1024;
   const [text, setText] = useState("");
   const [categoryId, setCategoryId] = useState(1);
   const [link, setLink] = useState("");
-  const [imageFile, setImageFile] = useState(null);
+  const [mediaFile, setMediaFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -25,10 +26,11 @@ export default function PostForm({ onSubmit, onClose }) {
         text: text.trim(),
         category: categoryName,
         link: link.trim(),
-        imageFile,
+        mediaFile,
       });
     } catch (err) {
       setError(err.message || "Could not publish this post.");
+    } finally {
       setLoading(false);
     }
   };
@@ -37,7 +39,7 @@ export default function PostForm({ onSubmit, onClose }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-lg bg-white rounded-2xl border border-gray-100 shadow-xl p-6 page-fade"
+        className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-100 shadow-xl p-6 page-fade"
       >
         <h2 className="font-display text-2xl text-gray-800 mb-1">
           Share a Happy Moment
@@ -80,7 +82,7 @@ export default function PostForm({ onSubmit, onClose }) {
         </select>
 
         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-          Link (optional)
+          Link (optional, used when no video is uploaded)
         </label>
         <input
           type="url"
@@ -91,12 +93,22 @@ export default function PostForm({ onSubmit, onClose }) {
         />
 
         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-          Image (optional)
+          Image or Video (optional)
         </label>
         <input
           type="file"
-          accept="image/*"
-          onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+          accept="image/*,video/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0] || null;
+            if (file && file.size > MAX_MEDIA_SIZE_BYTES) {
+              setError("File too large. Please upload a file smaller than 100MB.");
+              e.target.value = "";
+              setMediaFile(null);
+              return;
+            }
+            setError("");
+            setMediaFile(file);
+          }}
           className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm text-gray-800 mb-6"
         />
 
