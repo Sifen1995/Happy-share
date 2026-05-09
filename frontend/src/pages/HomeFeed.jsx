@@ -4,7 +4,7 @@ import {
   resolveCategoryId,
 } from "../constants/categories";
 import PostCard from "../components/PostCard";
-import FeelingLowOverlay from "../components/FeelingLowOverlay";
+import FeelingLow from "../components/FeelingLow";
 import HappyLimitOverlay from "../components/HappyLimitOverlay";
 import PostForm from "../components/PostForm";
 import { postsApi } from "../lib/api";
@@ -23,8 +23,6 @@ export default function HomeFeed({
   const [hasMore, setHasMore] = useState(true);
   const [loadingFeed, setLoadingFeed] = useState(false);
   const [feedError, setFeedError] = useState("");
-  const [showFeelingLow, setShowFeelingLow] = useState(false);
-  const [feelingLowText, setFeelingLowText] = useState("");
   const [showHappyLimit, setShowHappyLimit] = useState(false);
   const [showPostForm, setShowPostForm] = useState(false);
   const [happyLimitDismissed, setHappyLimitDismissed] = useState(false);
@@ -101,29 +99,9 @@ export default function HomeFeed({
     return data;
   };
 
-  const openFeelingLow = async () => {
-    setShowFeelingLow(true);
-    try {
-      const post = await postsApi.random();
-      setFeelingLowText(post.text);
-    } catch (_error) {
-      setFeelingLowText("You are not behind. You are building your own rhythm.");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 page-fade">
       {/* Overlays */}
-      {showFeelingLow && (
-        <FeelingLowOverlay
-          quote={feelingLowText}
-          onClose={() => setShowFeelingLow(false)}
-          onTryAnother={async () => {
-            const post = await postsApi.random();
-            setFeelingLowText(post.text);
-          }}
-        />
-      )}
       {showHappyLimit && !happyLimitDismissed && (
         <HappyLimitOverlay
           onDismiss={() => {
@@ -238,13 +216,7 @@ export default function HomeFeed({
         </main>
       </div>
 
-      {/* Floating Feeling Low button */}
-      <button
-        onClick={openFeelingLow}
-        className="fixed bottom-6 right-6 bg-gray-800 text-white text-sm font-medium px-5 py-3 rounded-full shadow-lg hover:bg-gray-700 hover:shadow-xl transition-all z-30"
-      >
-        I'm Feeling Low
-      </button>
+      <FeelingLow />
 
       {/* Footer */}
       <footer className="border-t border-gray-100 bg-white mt-12 py-6">

@@ -87,11 +87,26 @@ async function listPosts(req, res, next) {
 async function randomPost(_req, res, next) {
   try {
     const { rows } = await db.query(
-      `SELECT p.id, p.user_id, p.text, p.category_id, c.name AS category, p.link, p.image_url, p.created_at, u.username
+      `SELECT p.id,
+              p.user_id,
+              p.text,
+              p.category_id,
+              c.name AS category,
+              p.link,
+              p.image_url,
+              p.created_at,
+              u.username,
+              COALESCE(h.hearts_count, 0)::INTEGER AS hearts_count
        FROM posts p
        JOIN users u ON u.id = p.user_id
        JOIN categories c ON c.id = p.category_id
-       ORDER BY RANDOM()
+       LEFT JOIN (
+         SELECT post_id, COUNT(*) AS hearts_count
+         FROM hearts
+         GROUP BY post_id
+       ) h ON h.post_id = p.id
+       WHERE p.category_id IN (1, 3)
+       ORDER BY hearts_count DESC, RANDOM()
        LIMIT 1`,
     );
 
@@ -100,6 +115,35 @@ async function randomPost(_req, res, next) {
     }
 
     return res.json(rows[0]);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function listFeelingLowPosts(req, res, next) {
+  try {
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 50);
+    const { rows } = await db.query(
+      `SELECT p.id,
+              p.text,
+              p.image_url,
+              p.link,
+              u.username,
+              COALESCE(h.hearts_count, 0)::INTEGER AS hearts_count
+       FROM posts p
+       JOIN users u ON u.id = p.user_id
+       LEFT JOIN (
+         SELECT post_id, COUNT(*) AS hearts_count
+         FROM hearts
+         GROUP BY post_id
+       ) h ON h.post_id = p.id
+       WHERE p.category_id IN (1, 3)
+       ORDER BY hearts_count DESC, RANDOM()
+       LIMIT $1`,
+      [limit],
+    );
+
+    return res.json({ items: rows });
   } catch (error) {
     return next(error);
   }
@@ -305,6 +349,7 @@ async function toggleHeart(req, res, next) {
 module.exports = {
   listPosts,
   randomPost,
+  listFeelingLowPosts,
   createPost,
   deletePost,
   listMyPosts,

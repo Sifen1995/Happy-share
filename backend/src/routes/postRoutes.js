@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.get("/", postController.listPosts);
 router.get("/random", postController.randomPost);
+router.get("/feeling-low", postController.listFeelingLowPosts);
 router.get("/mine", protect, postController.listMyPosts);
 
 router.post("/", protect, upload.single("image"), postController.createPost);

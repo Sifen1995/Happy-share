@@ -66,6 +66,9 @@ export const postsApi = {
   random() {
     return apiRequest("/api/posts/random");
   },
+  feelingLow(limit = 20) {
+    return apiRequest(`/api/posts/feeling-low?limit=${limit}`);
+  },
   create(token, payload) {
     const form = new FormData();
     form.append("text", payload.text);
