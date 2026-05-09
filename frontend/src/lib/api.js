@@ -1,11 +1,13 @@
-const RAW_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").trim();
+const RAW_BASE_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
+).trim();
 const BASE_URLS = Array.from(
   new Set([
     RAW_BASE_URL,
     RAW_BASE_URL.replace("localhost", "127.0.0.1"),
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-  ])
+  ]),
 );
 
 async function apiRequest(path, options = {}) {
@@ -27,7 +29,7 @@ async function apiRequest(path, options = {}) {
   }
 
   throw new Error(
-    `Network error. Could not reach backend. Tried: ${BASE_URLS.join(", ")}`
+    `Network error. Could not reach backend. Tried: ${BASE_URLS.join(", ")}`,
   );
 }
 
@@ -65,6 +67,9 @@ export const postsApi = {
   },
   random() {
     return apiRequest("/api/posts/random");
+  },
+  feelingLow(limit = 20) {
+    return apiRequest(`/api/posts/feeling-low?limit=${limit}`);
   },
   create(token, payload) {
     const form = new FormData();

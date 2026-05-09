@@ -41,12 +41,21 @@ export default function PostCard({
 
   const linkSrc = resolveUrl(post.link);
 
+  const isVideoUrl = (url) => {
+    if (!url) return false;
+    return (
+      /res\.cloudinary\.com\/.+\/video\/upload/i.test(url) ||
+      /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url)
+    );
+  };
+
   const cloudinaryImageFromLink =
     !imageSrc && linkSrc && /res\.cloudinary\.com/i.test(linkSrc)
       ? linkSrc
       : null;
 
   const finalImageSrc = imageSrc || cloudinaryImageFromLink;
+  const finalVideoSrc = !finalImageSrc && isVideoUrl(linkSrc) ? linkSrc : null;
 
   useEffect(() => {
     setHearted(Boolean(post.hearted_by_me));
@@ -136,8 +145,19 @@ export default function PostCard({
         </div>
       )}
 
+      {/* Video */}
+      {finalVideoSrc && (
+        <div className="px-5 pb-3">
+          <video
+            src={finalVideoSrc}
+            controls
+            className="w-full h-56 object-cover rounded-xl bg-black"
+          />
+        </div>
+      )}
+
       {/* Link */}
-      {linkSrc && !cloudinaryImageFromLink && (
+      {linkSrc && !cloudinaryImageFromLink && !finalVideoSrc && (
         <div className="px-5 pb-3">
           <a
             href={linkSrc}

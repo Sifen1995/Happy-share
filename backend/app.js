@@ -24,9 +24,7 @@ pool.connect((err, client, release) => {
   if (err) {
     return console.error("❌ Database connection failed:", err.stack);
   }
-  console.log(
-    "✅ Database connected successfully to:",
-  );
+  console.log("✅ Database connected successfully to:");
   release();
 });
 
