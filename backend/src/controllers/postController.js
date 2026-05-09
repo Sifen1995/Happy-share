@@ -38,11 +38,12 @@ async function listPosts(req, res, next) {
     const offset = (page - 1) * pageSize;
 
     const { rows } = await db.query(
-      `SELECT p.id, p.user_id, p.text, p.category, p.link, p.image_url, p.created_at,
+      `SELECT p.id, p.user_id, p.text, p.category_id, c.name AS category, p.link, p.image_url, p.created_at,
               u.username,
               COALESCE(h.hearts_count, 0)::INTEGER AS hearts_count
        FROM posts p
        JOIN users u ON u.id = p.user_id
+       JOIN categories c ON c.id = p.category_id
        LEFT JOIN (
          SELECT post_id, COUNT(*) AS hearts_count
          FROM hearts
@@ -66,9 +67,10 @@ async function listPosts(req, res, next) {
 async function randomPost(_req, res, next) {
   try {
     const { rows } = await db.query(
-      `SELECT p.id, p.user_id, p.text, p.category, p.link, p.image_url, p.created_at, u.username
+      `SELECT p.id, p.user_id, p.text, p.category_id, c.name AS category, p.link, p.image_url, p.created_at, u.username
        FROM posts p
        JOIN users u ON u.id = p.user_id
+       JOIN categories c ON c.id = p.category_id
        ORDER BY RANDOM()
        LIMIT 1`
     );
@@ -87,11 +89,15 @@ async function createPost(req, res, next) {
   try {
     const body = req.body || {};
     const text = getFirstNonEmptyString(body.text);
-    const category_id = body.category_id || body.categoryId;
+    const categoryName = getFirstNonEmptyString(
+      body.category,
+      body.category_name,
+      body.categoryName
+    );
     const manualLink = getFirstNonEmptyString(body.link, body.links, body.url);
 
-    if (!text || !category_id) {
-      return res.status(400).json({ message: "text and category_id are required" });
+    if (!text || !categoryName) {
+      return res.status(400).json({ message: "text and category are required" });
     }
 
     const matchedBannedWord = findBannedWord(text);
@@ -101,6 +107,18 @@ async function createPost(req, res, next) {
         bannedWord: matchedBannedWord,
       });
     }
+
+    const categoryResult = await db.query(
+      `SELECT id, name FROM categories WHERE LOWER(name) = LOWER($1) LIMIT 1`,
+      [categoryName]
+    );
+    if (categoryResult.rowCount === 0) {
+      return res.status(400).json({
+        message: "Invalid category name",
+        category: categoryName,
+      });
+    }
+    const categoryId = categoryResult.rows[0].id;
 
     let imageUrl = getFirstNonEmptyString(
       body.image_url,
@@ -122,7 +140,7 @@ async function createPost(req, res, next) {
       `INSERT INTO posts (user_id, text, category_id, link, image_url)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id, user_id, text, category_id, link, image_url, created_at`,
-      [req.user.id, text, category_id, postLink, imageUrl]
+      [req.user.id, text, categoryId, postLink, imageUrl]
     );
 
     return res.status(201).json(rows[0]);
@@ -159,10 +177,11 @@ async function deletePost(req, res, next) {
 async function listMyPosts(req, res, next) {
   try {
     const { rows } = await db.query(
-      `SELECT id, user_id, text, category, link, image_url, created_at
-       FROM posts
-       WHERE user_id = $1
-       ORDER BY created_at DESC`,
+      `SELECT p.id, p.user_id, p.text, p.category_id, c.name AS category, p.link, p.image_url, p.created_at
+       FROM posts p
+       JOIN categories c ON c.id = p.category_id
+       WHERE p.user_id = $1
+       ORDER BY p.created_at DESC`,
       [req.user.id]
     );
     return res.json(rows);
