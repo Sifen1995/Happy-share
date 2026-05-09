@@ -1,2 +1,4 @@
 node_modules/
 .env
+#  ignore database.js file
+# /src/config/database.js
