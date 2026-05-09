@@ -31,6 +31,26 @@ function getFirstNonEmptyString(...values) {
   return null;
 }
 
+function toPositiveInt(value) {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isNaN(parsed) && parsed > 0) {
+    return parsed;
+  }
+  return null;
+}
+
+function parseJsonObject(value) {
+  if (!value) return null;
+  if (typeof value === "object") return value;
+  if (typeof value !== "string") return null;
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch (_error) {
+    return null;
+  }
+}
+
 async function listPosts(req, res, next) {
   try {
     const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
@@ -87,19 +107,54 @@ async function randomPost(_req, res, next) {
 
 async function createPost(req, res, next) {
   try {
-    const body = req.body || {};
-    const text = getFirstNonEmptyString(body.text);
+    const body = parseJsonObject(req.body) || req.body || {};
+    const payload = parseJsonObject(body.payload) || {};
+    const text = getFirstNonEmptyString(
+      body.text,
+      payload.text,
+      body.content,
+      payload.content,
+      body.caption,
+      payload.caption,
+      body.description,
+      payload.description,
+      body.post_text,
+      body.postText,
+      payload.post_text,
+      payload.postText,
+    );
+
+    const rawCategory =
+      body.category && typeof body.category === "object" ? body.category : null;
+    const payloadCategory =
+      payload.category && typeof payload.category === "object"
+        ? payload.category
+        : null;
+    const categoryIdFromBody = toPositiveInt(
+      body.category_id ||
+        body.categoryId ||
+        payload.category_id ||
+        payload.categoryId ||
+        rawCategory?.id ||
+        payloadCategory?.id,
+    );
     const categoryName = getFirstNonEmptyString(
       body.category,
+      payload.category,
       body.category_name,
       body.categoryName,
+      payload.category_name,
+      payload.categoryName,
+      rawCategory?.name,
+      payloadCategory?.name,
     );
     const manualLink = getFirstNonEmptyString(body.link, body.links, body.url);
 
-    if (!text || !categoryName) {
-      return res
-        .status(400)
-        .json({ message: "text and category are required" });
+    if (!text || (!categoryName && !categoryIdFromBody)) {
+      return res.status(400).json({
+        message: "text and category are required",
+        hint: "Send text + category/category_id in form-data or JSON",
+      });
     }
 
     const matchedBannedWord = findBannedWord(text);
@@ -110,10 +165,14 @@ async function createPost(req, res, next) {
       });
     }
 
-    const categoryResult = await db.query(
-      `SELECT id, name FROM categories WHERE LOWER(name) = LOWER($1) LIMIT 1`,
-      [categoryName],
-    );
+    const categoryResult = categoryIdFromBody
+      ? await db.query(`SELECT id, name FROM categories WHERE id = $1 LIMIT 1`, [
+          categoryIdFromBody,
+        ])
+      : await db.query(
+          `SELECT id, name FROM categories WHERE LOWER(name) = LOWER($1) LIMIT 1`,
+          [categoryName],
+        );
     if (categoryResult.rowCount === 0) {
       return res.status(400).json({
         message: "Invalid category name",

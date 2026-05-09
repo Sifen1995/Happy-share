@@ -69,7 +69,7 @@ export const postsApi = {
   create(token, payload) {
     const form = new FormData();
     form.append("text", payload.text);
-    form.append("category_id", String(payload.category_id));
+    if (payload.category) form.append("category", payload.category);
     if (payload.link) form.append("link", payload.link);
     if (payload.imageFile) form.append("image", payload.imageFile);
     return apiRequest("/api/posts", {

@@ -13,12 +13,17 @@ export default function PostForm({ onSubmit, onClose }) {
     e.preventDefault();
     if (!text.trim()) return setError("Post text is required.");
     if (!categoryId) return setError("Please select a category.");
+    const selectedCategory = FEED_CATEGORIES.find(
+      (item) => Number(item.id) === Number(categoryId),
+    );
+    const categoryName = selectedCategory?.dbName || selectedCategory?.label;
+    if (!categoryName) return setError("Please select a valid category.");
     setLoading(true);
     setError("");
     try {
       await onSubmit({
         text: text.trim(),
-        category_id: Number(categoryId),
+        category: categoryName,
         link: link.trim(),
         imageFile,
       });
