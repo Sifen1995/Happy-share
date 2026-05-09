@@ -22,6 +22,15 @@ function findBannedWord(text) {
   });
 }
 
+function getFirstNonEmptyString(...values) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+  return null;
+}
+
 async function listPosts(req, res, next) {
   try {
     const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
@@ -76,7 +85,11 @@ async function randomPost(_req, res, next) {
 
 async function createPost(req, res, next) {
   try {
-    const { text, category_id, link } = req.body;
+    const body = req.body || {};
+    const text = getFirstNonEmptyString(body.text);
+    const category_id = body.category_id || body.categoryId;
+    const manualLink = getFirstNonEmptyString(body.link, body.links, body.url);
+
     if (!text || !category_id) {
       return res.status(400).json({ message: "text and category_id are required" });
     }
@@ -89,12 +102,17 @@ async function createPost(req, res, next) {
       });
     }
 
-    let imageUrl = req.body.image_url || null;
-    let postLink = link || null;
+    let imageUrl = getFirstNonEmptyString(
+      body.image_url,
+      body.imageUrl,
+      body.image
+    );
+    let postLink = manualLink;
 
     if (req.file) {
       if (req.file.mimetype && req.file.mimetype.startsWith("video")) {
-        postLink = req.file.path;
+        // Keep any user-provided link; only fallback to uploaded video URL.
+        postLink = postLink || req.file.path;
       } else {
         imageUrl = req.file.path;
       }
