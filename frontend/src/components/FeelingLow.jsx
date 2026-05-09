@@ -40,9 +40,9 @@ export default function FeelingLow() {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl rounded-2xl bg-white shadow-2xl p-5">
+          <div className="w-full max-w-4xl rounded-2xl bg-white shadow-2xl p-6 md:p-8">
             <div className="flex items-start justify-between gap-3 mb-4">
-              <h2 className="font-display text-2xl text-gray-800">Instant Mood Boost</h2>
+              <h2 className="font-display text-3xl text-gray-800">Instant Mood Boost</h2>
               <button
                 onClick={() => setOpen(false)}
                 className="text-sm text-gray-500 hover:text-gray-700"
@@ -58,16 +58,16 @@ export default function FeelingLow() {
             ) : posts.length === 0 ? (
               <p className="text-sm text-gray-500">No mood-boost posts available yet.</p>
             ) : (
-              <div className="max-h-[65vh] overflow-y-auto space-y-4 pr-1">
+              <div className="max-h-[75vh] overflow-y-auto space-y-5 pr-2">
                 {posts.map((post) => (
                   <article
                     key={post.id}
-                    className="rounded-xl border border-gray-100 bg-gray-50 p-3"
+                    className="rounded-xl border border-gray-100 bg-gray-50 p-4"
                   >
                     {post.link ? (
                       <video
                         src={post.link}
-                        className="w-full rounded-xl mb-3 max-h-72 object-cover bg-black"
+                        className="w-full rounded-xl mb-4 max-h-[28rem] object-cover bg-black"
                         autoPlay
                         loop
                         muted
@@ -78,11 +78,11 @@ export default function FeelingLow() {
                       <img
                         src={post.image_url}
                         alt="Mood boost"
-                        className="w-full rounded-xl mb-3 max-h-72 object-cover"
+                        className="w-full rounded-xl mb-4 max-h-[28rem] object-cover"
                       />
                     ) : null}
 
-                    <blockquote className="text-gray-700 text-sm leading-relaxed border-l-2 border-emerald-300 pl-3 mb-2">
+                    <blockquote className="text-gray-700 text-base leading-relaxed border-l-2 border-emerald-300 pl-3 mb-2">
                       {post.text}
                     </blockquote>
                     <div className="flex items-center justify-between text-xs text-gray-500">

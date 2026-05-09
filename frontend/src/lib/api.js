@@ -9,20 +9,31 @@ const BASE_URLS = Array.from(
 );
 
 async function apiRequest(path, options = {}) {
+  const { timeoutMs = 30000, ...fetchOptions } = options;
   for (const baseUrl of BASE_URLS) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const res = await fetch(`${baseUrl}${path}`, options);
+      const res = await fetch(`${baseUrl}${path}`, {
+        ...fetchOptions,
+        signal: controller.signal,
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         throw new Error(data.message || `Request failed (${res.status})`);
       }
       return data;
     } catch (error) {
+      if (error?.name === "AbortError") {
+        throw new Error("Request timed out. Please try again.");
+      }
       // If the server responded with an app error, don't try other hosts.
       if (!(error instanceof TypeError)) {
         throw error;
       }
       // keep trying alternate base URLs
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
@@ -74,11 +85,12 @@ export const postsApi = {
     form.append("text", payload.text);
     if (payload.category) form.append("category", payload.category);
     if (payload.link) form.append("link", payload.link);
-    if (payload.imageFile) form.append("image", payload.imageFile);
+    if (payload.mediaFile) form.append("image", payload.mediaFile);
     return apiRequest("/api/posts", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: form,
+      timeoutMs: 180000,
     });
   },
   remove(token, postId) {

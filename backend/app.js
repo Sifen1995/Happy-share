@@ -50,6 +50,20 @@ app.use("/api/posts", postRoutes);
 // --- ERROR HANDLING ---
 app.use((err, _req, res, _next) => {
   console.error("🔥 Server Error:", err);
+
+  if (err?.name === "MulterError" && err?.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({
+      message: "Upload too large. Please use a smaller image/video file.",
+    });
+  }
+
+  if (err?.name === "TimeoutError" || err?.http_code === 499) {
+    return res.status(408).json({
+      message:
+        "Upload timed out while sending media to Cloudinary. Try a smaller file or retry.",
+    });
+  }
+
   res.status(500).json({
     message: "Internal server error",
     error: process.env.NODE_ENV === "development" ? err.message : {},
