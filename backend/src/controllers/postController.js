@@ -76,9 +76,9 @@ async function randomPost(_req, res, next) {
 
 async function createPost(req, res, next) {
   try {
-    const { text, category, link } = req.body;
-    if (!text || !category) {
-      return res.status(400).json({ message: "text and category are required" });
+    const { text, category_id, link } = req.body;
+    if (!text || !category_id) {
+      return res.status(400).json({ message: "text and category_id are required" });
     }
 
     const matchedBannedWord = findBannedWord(text);
@@ -89,13 +89,22 @@ async function createPost(req, res, next) {
       });
     }
 
-    const imageUrl = req.file ? req.file.path : req.body.image_url || null;
+    let imageUrl = req.body.image_url || null;
+    let postLink = link || null;
+
+    if (req.file) {
+      if (req.file.mimetype && req.file.mimetype.startsWith("video")) {
+        postLink = req.file.path;
+      } else {
+        imageUrl = req.file.path;
+      }
+    }
 
     const { rows } = await db.query(
-      `INSERT INTO posts (user_id, text, category, link, image_url)
+      `INSERT INTO posts (user_id, text, category_id, link, image_url)
        VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, user_id, text, category, link, image_url, created_at`,
-      [req.user.id, text, category, link || null, imageUrl]
+       RETURNING id, user_id, text, category_id, link, image_url, created_at`,
+      [req.user.id, text, category_id, postLink, imageUrl]
     );
 
     return res.status(201).json(rows[0]);
