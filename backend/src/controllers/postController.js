@@ -22,6 +22,15 @@ function findBannedWord(text) {
   });
 }
 
+function getFirstNonEmptyString(...values) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+  return null;
+}
+
 async function listPosts(req, res, next) {
   try {
     const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
@@ -41,7 +50,7 @@ async function listPosts(req, res, next) {
        ) h ON h.post_id = p.id
        ORDER BY p.created_at DESC
        LIMIT $1 OFFSET $2`,
-      [pageSize, offset]
+      [pageSize, offset],
     );
 
     return res.json({
@@ -61,7 +70,7 @@ async function randomPost(_req, res, next) {
        FROM posts p
        JOIN users u ON u.id = p.user_id
        ORDER BY RANDOM()
-       LIMIT 1`
+       LIMIT 1`,
     );
 
     if (!rows[0]) {
@@ -76,9 +85,15 @@ async function randomPost(_req, res, next) {
 
 async function createPost(req, res, next) {
   try {
-    const { text, category_id, link } = req.body;
+    const body = req.body || {};
+    const text = getFirstNonEmptyString(body.text);
+    const category_id = body.category_id || body.categoryId;
+    const manualLink = getFirstNonEmptyString(body.link, body.links, body.url);
+
     if (!text || !category_id) {
-      return res.status(400).json({ message: "text and category_id are required" });
+      return res
+        .status(400)
+        .json({ message: "text and category_id are required" });
     }
 
     const matchedBannedWord = findBannedWord(text);
@@ -89,12 +104,17 @@ async function createPost(req, res, next) {
       });
     }
 
-    let imageUrl = req.body.image_url || null;
-    let postLink = link || null;
+    let imageUrl = getFirstNonEmptyString(
+      body.image_url,
+      body.imageUrl,
+      body.image,
+    );
+    let postLink = manualLink;
 
     if (req.file) {
       if (req.file.mimetype && req.file.mimetype.startsWith("video")) {
-        postLink = req.file.path;
+        // Keep any user-provided link; only fallback to uploaded video URL.
+        postLink = postLink || req.file.path;
       } else {
         imageUrl = req.file.path;
       }
@@ -104,7 +124,7 @@ async function createPost(req, res, next) {
       `INSERT INTO posts (user_id, text, category_id, link, image_url)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id, user_id, text, category_id, link, image_url, created_at`,
-      [req.user.id, text, category_id, postLink, imageUrl]
+      [req.user.id, text, category_id, postLink, imageUrl],
     );
 
     return res.status(201).json(rows[0]);
@@ -128,7 +148,9 @@ async function deletePost(req, res, next) {
     }
 
     if (rows[0].user_id !== req.user.id) {
-      return res.status(403).json({ message: "Only the author can delete this post" });
+      return res
+        .status(403)
+        .json({ message: "Only the author can delete this post" });
     }
 
     await db.query("DELETE FROM posts WHERE id = $1", [postId]);
@@ -145,7 +167,7 @@ async function listMyPosts(req, res, next) {
        FROM posts
        WHERE user_id = $1
        ORDER BY created_at DESC`,
-      [req.user.id]
+      [req.user.id],
     );
     return res.json(rows);
   } catch (error) {
@@ -160,14 +182,16 @@ async function toggleHeart(req, res, next) {
       return res.status(400).json({ message: "Invalid post id" });
     }
 
-    const exists = await db.query("SELECT id FROM posts WHERE id = $1", [postId]);
+    const exists = await db.query("SELECT id FROM posts WHERE id = $1", [
+      postId,
+    ]);
     if (exists.rowCount === 0) {
       return res.status(404).json({ message: "Post not found" });
     }
 
     const heart = await db.query(
       "SELECT id FROM hearts WHERE post_id = $1 AND user_id = $2",
-      [postId, req.user.id]
+      [postId, req.user.id],
     );
 
     let hearted;
@@ -187,7 +211,7 @@ async function toggleHeart(req, res, next) {
 
     const count = await db.query(
       "SELECT COUNT(*)::INTEGER AS hearts_count FROM hearts WHERE post_id = $1",
-      [postId]
+      [postId],
     );
 
     return res.json({
