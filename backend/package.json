@@ -4,6 +4,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
+    "start": "node app.js",
     "db:up": "docker compose up -d db pgadmin",
     "db:down": "docker compose down",
     "migrate:up": "node-pg-migrate up -m db/migrations -d DATABASE_URL",
