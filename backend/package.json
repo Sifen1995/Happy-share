@@ -1,0 +1,16 @@
+{
+  "name": "happy-share-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "db:up": "docker compose up -d db pgadmin",
+    "db:down": "docker compose down",
+    "migrate:up": "node-pg-migrate up -m db/migrations -d DATABASE_URL",
+    "migrate:down": "node-pg-migrate down -m db/migrations -d DATABASE_URL",
+    "migrate:create": "node-pg-migrate create -m db/migrations"
+  },
+  "devDependencies": {
+    "node-pg-migrate": "^8.0.3"
+  }
+}

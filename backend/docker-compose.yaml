@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Database: PostgreSQL [cite: 127]
+  db:
+    image: postgres:15-alpine
+    container_name: happyshare_db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: happyshare
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Database Management: pgAdmin
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: happyshare_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@happyshare.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
