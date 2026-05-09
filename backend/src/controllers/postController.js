@@ -107,7 +107,7 @@ async function createPost(req, res, next) {
     let imageUrl = getFirstNonEmptyString(
       body.image_url,
       body.imageUrl,
-      body.image,
+      body.image
     );
     let postLink = manualLink;
 
