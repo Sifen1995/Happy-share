@@ -8,8 +8,10 @@ exports.up = (pgm) => {
       name VARCHAR(50) UNIQUE NOT NULL
     );
 
+    -- This change prevents the "Duplicate Key" error
     INSERT INTO categories (name) 
-    VALUES ('funny'), ('learn'), ('heartwarming'), ('good news');
+    VALUES ('funny'), ('learn'), ('heartwarming'), ('good news')
+    ON CONFLICT (name) DO NOTHING; 
   `);
 };
 
